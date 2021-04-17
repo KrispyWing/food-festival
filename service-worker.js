@@ -17,6 +17,21 @@ const APP_PREFIX = 'FoodFest-';
 const VERSION = 'version_01';
 const CACHE_NAME = APP_PREFIX + VERSION;
 
+self.addEventListener('fetch', function(e) {
+  console.log('fetch request : ' + e.request.url)
+  e.respondWith(
+    caches.match(e.request).then(function(request) {
+      if (request) {
+        console.log('responding with cache : ' + e.request.url)
+        return request
+      } else {
+        console.log('file is not cached, fetching : ' + e.request.url)
+        return fetch(e.request)
+      }
+    })
+  )
+})
+
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
@@ -46,17 +61,3 @@ self.addEventListener('activate', function(e) {
   );
 });
 
-self.addEventListener('fetch', function(e) {
-  console.log('fetch request : ' + e.request.url)
-  e.respondWith(
-    caches.match(e.request).then(function(request) {
-      if (request) {
-        console.log('responding with cache : ' + e.request.url)
-        return request
-      } else {
-        console.log('file is not cached, fetching : ' + e.request.url)
-        return fetch(e.request)
-      }
-    })
-  )
-})
